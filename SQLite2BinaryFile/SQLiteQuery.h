@@ -5,54 +5,29 @@
 #include <vector>
 #include <sstream>
 
-template<class char_t> 
 class CSQLiteQuery
-{
-	CSQLiteQuery(const CSQLiteQuery<char_t>&);
-	CSQLiteQuery<char_t>& operator=(const CSQLiteQuery<char_t>&) {}
+{	
+	CSQLiteQuery(const CSQLiteQuery&);
+	CSQLiteQuery& operator=(const CSQLiteQuery&) {}
+protected:
+	CSQLiteQuery() {}
 public:
-	virtual ~CSQLiteQuery() = 0;
-	virtual void ToString() = 0;
+	virtual ~CSQLiteQuery() {};
+	virtual std::string ToString() const = 0;
 };
 
-template<class char_t>
-class CSQLiteSelectQuery : public CSQLiteQuery<char_t>
+class CSQLiteSelectQuery : public CSQLiteQuery
 {
-	typedef std::basic_string<char_t> string_t;
-	string_t m_sQuery;
+	std::string m_sQuery;
 
-	CSQLiteSelectQuery(const CSQLiteSelectQuery<char_t>&);
-	CSQLiteSelectQuery<char_t>& operator=(const CSQLiteSelectQuery<char_t>&) {}
+	CSQLiteSelectQuery(const CSQLiteSelectQuery&);
+	CSQLiteSelectQuery& operator=(const CSQLiteSelectQuery&) {}
 public:
-	CSQLiteSelectQuery(const string_t& sTableName, std::vector<string_t>& vecFields, const string_t& sSortBy)
-	{
-		std::stringstream<char_t> stream;
-
-		stream << "select ";
-		for (auto& it = vecFields.begin(); it != vecFields.end(); ++it)
-		{
-			stream << it;
-			if (it != vecFields.back())
-			{
-				stream << ", ";
-			}
-		}
-
-		stream << " from " << sTableName;
-		if (!sSortBy.empty())
-		{
-			stream << " group by " << sSortBy;
-		}
-
-		m_sQuery = stream.str();
-	}
+	CSQLiteSelectQuery(const std::string& sTableName, const std::vector<std::string>& vecFields, const std::string& sSortBy);
 
 	~CSQLiteSelectQuery() {}
 
-	virtual void ToString()
-	{
-		return m_sQuery;
-	}
+	virtual std::string ToString() const;
 };
 
 #endif // _SQLLITE_QUERY_H

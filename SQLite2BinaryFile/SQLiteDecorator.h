@@ -2,11 +2,11 @@
 #define  _SQLLITE_DECORATOR_H
 
 #include "SQLiteQuery.h"
+#include "SQLiteResult.h"
+
+#include <vector>
 #include <memory>
 #include <string>
-
-//SQLite Header and library
-#include "SQLite\sqlite3.h"
 
 using namespace std;
 
@@ -20,10 +20,9 @@ public:
 	CSQLiteDBDecorator(const string& strDbPath);
 	~CSQLiteDBDecorator();
 
+	CSQLiteResult Execute(const CSQLiteQuery& sSQL);
 	static shared_ptr<CSQLiteDBDecorator> GetInstance(const string& strDbPath);
 protected:
-	void ExcuteSelect(const std::string& strQuery);
-
 	sqlite3	 *m_pDatabase;
 };
 

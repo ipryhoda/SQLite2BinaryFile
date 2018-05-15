@@ -6,49 +6,41 @@
 #include <string>
 #include <vector>
 
-template<class char_t>
 class CSQLiteObject
 {	
-	CSQLiteObject(const CSQLiteObject<char_t>&);
-	CSQLiteObject<char_t>& operator=(const CSQLiteObject<char_t>&) {}
+	CSQLiteObject(const CSQLiteObject&);
+	CSQLiteObject& operator=(const CSQLiteObject&) {}
 public:
-	CSQLiteTable(const std::basic_string<char_t>& sName) : m_sName(sName) {}
+	CSQLiteObject(const std::string& sName) : m_sName(sName) {}
 	virtual ~CSQLiteObject() {}
 protected:
-	std::basic_string<char_t> m_sName;
+	std::string m_sName;
 };
 
-class CSQLiteField : CSQLiteObject<char_t>
+class CSQLiteField : public CSQLiteObject
 {
 	CSQLiteField(const CSQLiteField&);
 	CSQLiteField& operator=(const CSQLiteField&) {}
 public:
-	CSQLiteField(const std::basic_string<char_t>& sName) : CSQLiteTable(sName) {}
+	CSQLiteField(const std::string& sName, int iType) : CSQLiteObject(sName), m_iType(iType) {}
 	~CSQLiteField() {}
+private:
+	int m_iType;
 };
 
-class CSQLiteRow
-{
-	CSQLiteRow(const CSQLiteRow&);
-	CSQLiteRow& operator=(const CSQLiteRow&) {}
-public:
-	~CSQLiteRow() {}
-
-protected:
-	std::vector<ISQLiteItem> m_vecItems;
-};
-
-template<class char_t>
-class CSQLiteTable : public CSQLiteObject<char_t>
+#if 0
+class CSQLiteTable : public CSQLiteObject
 {
 	CSQLiteTable(const CSQLiteTable&);
-	CSQLiteTable<char_t>& operator=(const CSQLiteTable&) {}
+	CSQLiteTable& operator=(const CSQLiteTable&) {}
 public:
-	CSQLiteTable(const std::basic_string<char_t>& sName, std::vector<std::shared_ptr<CSQLiteField>> vecFields) : CSQLiteTable(sName), m_vecFields(vecFields) {}
+	CSQLiteTable(const std::string& sName, std::vector<CSQLiteField>& vecFields) 
+		: CSQLiteObject(sName), m_vecFields(vecFields) {}
 	~CSQLiteTable() {}
 private:
-	std::vector<std::shared_ptr<CSQLiteField>> m_vecFields;	
+	std::vector<CSQLiteField> m_vecFields;	
 };
 
+#endif
 
 #endif // _SQLLITE_OBJECT_H
