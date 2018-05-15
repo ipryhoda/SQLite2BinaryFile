@@ -13,16 +13,24 @@ public:
 	virtual ~CSQLiteItem() {};
 };
 
+template <typename Type>
+struct is_sqlite_value : public std::integral_constant<
+	bool,
+	std::is_floating_point<Type>::value
+	|| std::is_integral<Type>::value
+> { };
+
 template<typename numeric_t>
 class CSQLiteNumericItem : public CSQLiteItem
 {
+	using type_t = typename std::enable_if<is_sqlite_value<numeric_t>::value, numeric_t>::type;
 	CSQLiteNumericItem(const CSQLiteNumericItem<numeric_t>&);
 	CSQLiteNumericItem& operator=(const CSQLiteNumericItem<numeric_t>&);
 public:
-	CSQLiteNumericItem(numeric_t value) : m_value(value) {}
+	CSQLiteNumericItem(type_t value) : m_value(value) {}
 	~CSQLiteNumericItem() {}
 private:
-	numeric_t m_value;
+	type_t m_value;
 };
 
 class CSQLLiteBinaryItem : public CSQLiteItem
