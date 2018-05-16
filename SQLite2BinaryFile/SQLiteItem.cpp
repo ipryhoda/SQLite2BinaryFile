@@ -1,10 +1,25 @@
 #include "SQLiteItem.h"
 
+CSQLiteItem::CSQLiteItem() : CArchieve<char>()
+{
+}
 
-CSQLLiteBinaryItem::CSQLLiteBinaryItem(std::uint8_t* pv, size_t iBytesCount) :  m_vec(&pv[0], &pv[iBytesCount])
+CSQLiteItem::~CSQLiteItem()
+{
+}
+
+CSQLLiteBinaryItem::CSQLLiteBinaryItem(const std::uint8_t* pv, size_t iBytesCount) :  m_vec(&pv[0], &pv[iBytesCount])
 {
 }
 
 CSQLLiteBinaryItem::~CSQLLiteBinaryItem()
+{
+}
+
+CSQLLiteNullItem::CSQLLiteNullItem()
+{
+}
+
+CSQLLiteNullItem::~CSQLLiteNullItem()
 {
 }

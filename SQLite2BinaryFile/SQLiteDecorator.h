@@ -8,6 +8,7 @@
 #include <memory>
 #include <string>
 
+
 using namespace std;
 
 //SQLite Decorator Class
@@ -21,9 +22,8 @@ public:
 	~CSQLiteDBDecorator();
 
 	CSQLiteResult Execute(const CSQLiteQuery& sSQL);
-	static shared_ptr<CSQLiteDBDecorator> GetInstance(const string& strDbPath);
 protected:
-	sqlite3	 *m_pDatabase;
+	std::shared_ptr<sqlite3> m_spSqlite3;
 };
 
 
