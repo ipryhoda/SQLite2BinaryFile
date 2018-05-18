@@ -1,6 +1,5 @@
 #include "SQLiteObject.h"
 #include "SQLiteDecorator.h"
-#include "SQLiteResult.h"
 #include <iomanip>
 
 CSQLiteObject::CSQLiteObject(CSQLiteObject&& other)
@@ -25,12 +24,14 @@ std::ostream& operator<< (std::ostream& stream, const CSQLiteField& sField)
 	return stream;
 }
 
+#if 0
 CSQLiteTable::CSQLiteTable(const std::string& sName, std::unique_ptr<CSQLiteResult>&& upSQLiteResult) : CSQLiteObject(sName), 
 m_upSQLiteResult(std::move(upSQLiteResult))
 {}
 
 CSQLiteTable::~CSQLiteTable()
 {}
+#endif
 
 
 CSQLiteDatabase::CSQLiteDatabase(const std::string& sName, const std::vector<shared_ptr<CSQLiteQuery> >& vecQueries) 

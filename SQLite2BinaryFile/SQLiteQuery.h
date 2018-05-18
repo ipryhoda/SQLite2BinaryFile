@@ -1,13 +1,18 @@
 #ifndef  _SQLLITE_QUERY_H
 #define  _SQLLITE_QUERY_H
 
+#include "Archieve.h"
+
 #include <string>
 #include <vector>
 #include <sstream>
+#include <memory>
+#include <functional>
 
 using namespace std;
 
-class CSQLiteQuery
+class CSQLiteDBDecorator;
+class CSQLiteQuery : public CArchieve<char>
 {	
 	CSQLiteQuery(const CSQLiteQuery&);
 	CSQLiteQuery& operator=(const CSQLiteQuery&) {}
@@ -37,14 +42,27 @@ class CSQLiteSelectQuery : public CSQLiteQuery
 	CSQLiteSelectQuery(const CSQLiteSelectQuery&);
 	CSQLiteSelectQuery& operator=(const CSQLiteSelectQuery&) {}
 public:
-	CSQLiteSelectQuery(const std::string& sTableName, const std::vector<std::string>& vecFields, const std::string& strSortBy) noexcept;
+	CSQLiteSelectQuery(const std::string& sTableName, 
+		const std::vector<std::string>& vecFields, 
+		const std::string& strSortBy) noexcept;
 	~CSQLiteSelectQuery() {}
 
 	virtual std::string ToString() const;
+
+	void deserialize(istream_t& stream)
+	{
+		return;
+	}
+
+	void serialize(ostream_t& stream)
+	{
+		return;
+	}
 protected:
 	std::vector<std::string> m_vecFields;
 	std::string m_strTable;
 	CSortBy m_sSortBy;
+	bool m_bFlagSet;
 };
 
 #endif // _SQLLITE_QUERY_H
