@@ -1,6 +1,6 @@
 #include "SQLiteItem.h"
 
-CSQLiteItem::CSQLiteItem() : CArchieve<char>()
+CSQLiteItem::CSQLiteItem() 
 {
 }
 

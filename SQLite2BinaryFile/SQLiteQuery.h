@@ -12,7 +12,7 @@
 using namespace std;
 
 class CSQLiteDBDecorator;
-class CSQLiteQuery : public CArchieve<char>
+class CSQLiteQuery
 {	
 	CSQLiteQuery(const CSQLiteQuery&);
 	CSQLiteQuery& operator=(const CSQLiteQuery&) {}
@@ -49,12 +49,12 @@ public:
 
 	virtual std::string ToString() const;
 
-	void deserialize(istream_t& stream)
+	void deserialize()
 	{
 		return;
 	}
 
-	void serialize(ostream_t& stream)
+	void serialize()
 	{
 		return;
 	}

@@ -5,7 +5,7 @@
 #include <cstdint>
 #include <vector>
 
-class CSQLiteItem : public CArchieve<char>
+class CSQLiteItem
 {
 	CSQLiteItem(const CSQLiteItem&);
 	CSQLiteItem& operator=(const CSQLiteItem&);
@@ -32,15 +32,12 @@ public:
 	CSQLiteNumericItem(type_t value) : m_value(value) {}
 	~CSQLiteNumericItem() {}
 
-	// Overriden
-	void deserialize(istream_t& stream)
+	void deserialize()
 	{
-		stream.read(reinterpret_cast<char*>(&m_value), sizeof(m_value));
 	}
 
-	void serialize(ostream_t& stream)
+	void serialize()
 	{
-		stream.write(reinterpret_cast<const char*>(&m_value), sizeof(m_value));
 	}
 private:
 	type_t m_value;
@@ -54,19 +51,12 @@ public:
 	CSQLLiteBinaryItem(const std::uint8_t* pv, size_t iBytesCount);
 	~CSQLLiteBinaryItem();
 	// Overriden
-	void deserialize(istream_t& stream)
+	void deserialize()
 	{
-		std::uint64_t iSize = 0;
-		stream.read(reinterpret_cast<char*>(&iSize), sizeof(iSize));
-		m_vec.resize(iSize);
-		stream.read(reinterpret_cast<char*>(&m_vec[0]), iSize);
 	}
 
-	void serialize(ostream_t& stream)
+	void serialize()
 	{
-		const std::uint64_t iSize = m_vec.size();
-		stream.write(reinterpret_cast<const char*>(&iSize), sizeof(iSize));
-		stream.write(reinterpret_cast<const char*>(&m_vec[0]), m_vec.size());
 	}
 
 private:
@@ -81,20 +71,13 @@ class CSQLLiteStringItem : public CSQLiteItem
 public:
 	CSQLLiteStringItem(const std::basic_string<char_t>& sText) : m_sText(sText) {}
 	~CSQLLiteStringItem() {}
-	// Overriden
-	void deserialize(istream_t& stream)
+
+	void deserialize()
 	{
-		std::uint64_t iSize = 0;
-		stream.read(reinterpret_cast<char*>(&iSize), sizeof(iSize));
-		m_sText.resize(iSize);
-		stream.read(reinterpret_cast<char*>(&m_sText[0]), iSize);
 	}
 
-	void serialize(ostream_t& stream)
+	void serialize()
 	{
-		const std::uint64_t iSize = m_sText.size() * sizeof(char_t);
-		stream.write(reinterpret_cast<const char*>(&iSize), sizeof(iSize));
-		stream.write(reinterpret_cast<const char*>(&m_sText[0]), iSize);
 	}
 private:
 	std::basic_string<char_t> m_sText;
@@ -107,17 +90,13 @@ class CSQLLiteNullItem : public CSQLiteItem
 public:
 	CSQLLiteNullItem();
 	~CSQLLiteNullItem();
-	// Overriden
-	void deserialize(istream_t& stream)
+
+	void deserialize()
 	{
-		std::uint8_t uiNull = 0;
-		stream.read(reinterpret_cast<char*>(&uiNull), sizeof(uiNull));
 	}
 
-	void serialize(ostream_t& stream)
+	void serialize()
 	{
-		const std::uint8_t uiNull = 0;
-		stream.write(reinterpret_cast<const char*>(&uiNull), sizeof(uiNull));
 	}
 };
 

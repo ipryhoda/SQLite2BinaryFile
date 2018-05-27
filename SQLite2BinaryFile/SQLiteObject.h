@@ -9,7 +9,7 @@
 #include <vector>
 #include <memory>
 
-class CSQLiteObject : public CArchieve<char>
+class CSQLiteObject
 {	
 	CSQLiteObject(const CSQLiteObject&);
 	CSQLiteObject& operator=(const CSQLiteObject&) {}
@@ -18,20 +18,12 @@ public:
 	CSQLiteObject(CSQLiteObject&& other);
 	virtual ~CSQLiteObject() {}
 
-	// Overriden
-	void deserialize(istream_t& stream)
+	void deserialize()
 	{
-		std::uint64_t iSize = 0;
-		stream.read(reinterpret_cast<char*>(&iSize), sizeof(iSize));
-		m_sName.resize(iSize);
-		stream.read(reinterpret_cast<char*>(&m_sName[0]), iSize);
 	}
 
-	void serialize(ostream_t& stream)
+	void serialize()
 	{
-		const std::uint64_t iSize = m_sName.size();
-		stream.write(reinterpret_cast<const char*>(&iSize), sizeof(iSize));
-		stream.write(reinterpret_cast<const char*>(&m_sName[0]), iSize);
 	}
 
 	friend std::ostream& operator<< (std::ostream& stream, const CSQLiteObject& sField);
@@ -48,15 +40,11 @@ public:
 	CSQLiteField(CSQLiteField&& other);
 	~CSQLiteField() {}
 
-	void deserialize(istream_t& stream)
+	void deserialize()
 	{
-		CSQLiteObject::deserialize(stream);
-		stream.read(reinterpret_cast<char*>(&m_iType), sizeof(m_iType));
 	}
-	void serialize(ostream_t& stream)
+	void serialize()
 	{
-		CSQLiteObject::serialize(stream);
-		stream.write(reinterpret_cast<char*>(&m_iType), sizeof(m_iType));
 	}
 
 	friend std::ostream& operator<< (std::ostream& stream, const CSQLiteField& sField);
@@ -87,20 +75,12 @@ public:
 	CSQLiteDatabase(const std::string& sName, const std::vector<shared_ptr<CSQLiteQuery> >& vecQueries);
 	~CSQLiteDatabase();
 
-	void deserialize(istream_t& stream)
+	void deserialize()
 	{
-		std::uint64_t iSize = 0;
-		stream.read(reinterpret_cast<char*>(&iSize), sizeof(iSize));
 	}
 
-	void serialize(ostream_t& stream)
+	void serialize()
 	{
-		const std::uint64_t iSize = m_vecQueries.size();
-		stream.write(reinterpret_cast<const char*>(&iSize), sizeof(iSize));
-		for (auto& it : m_vecQueries)
-		{
-			it->serialize(stream);
-		}	
 	}
 
 private:
