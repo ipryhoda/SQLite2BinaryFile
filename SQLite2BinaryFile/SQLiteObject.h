@@ -2,90 +2,58 @@
 #define  _SQLLITE_OBJECT_H
 
 #include "SQLiteItem.h"
-#include "Archieve.h"
+#include "Archive.h"
 #include "SQLiteQuery.h"
+#include "SQLiteResult.h"
 
 #include <string>
 #include <vector>
 #include <memory>
 
 class CSQLiteObject
-{	
-	CSQLiteObject(const CSQLiteObject&);
-	CSQLiteObject& operator=(const CSQLiteObject&) {}
+{
+    CSQLiteObject(const CSQLiteObject&);
+    CSQLiteObject& operator=(const CSQLiteObject&) {}
 public:
-	CSQLiteObject(const std::string& sName) : m_sName(sName) {}
-	CSQLiteObject(CSQLiteObject&& other);
+    CSQLiteObject(const std::string& sName) : m_strName(sName) {}
+    CSQLiteObject(CSQLiteObject&& other);
+    CSQLiteObject() {}
 	virtual ~CSQLiteObject() {}
 
-	void deserialize()
-	{
-	}
-
-	void serialize()
-	{
-	}
-
+    void deserialize(CArchieve & ar);
+    void serialize(CArchieve & ar);
 	friend std::ostream& operator<< (std::ostream& stream, const CSQLiteObject& sField);
 protected:
-	std::string m_sName;
+	std::string m_strName;
 };
 
-class CSQLiteField : public CSQLiteObject
-{
-	CSQLiteField(const CSQLiteField&);
-	CSQLiteField& operator=(const CSQLiteField&);
-public:
-	CSQLiteField(const std::string& sName, int iType) : CSQLiteObject(sName), m_iType(iType) {}
-	CSQLiteField(CSQLiteField&& other);
-	~CSQLiteField() {}
-
-	void deserialize()
-	{
-	}
-	void serialize()
-	{
-	}
-
-	friend std::ostream& operator<< (std::ostream& stream, const CSQLiteField& sField);
-private:
-	int m_iType;
-};
-
-#if 0
-class CSQLiteResult;
 class CSQLiteTable : public CSQLiteObject
 {
 	CSQLiteTable(const CSQLiteTable&);
 	CSQLiteTable& operator=(const CSQLiteTable&);
 public:
-	CSQLiteTable(const std::string& sName, std::unique_ptr<CSQLiteResult>&& upSQLiteResult);
+	CSQLiteTable(const std::string& sName, std::vector<string> && vecFields, std::vector< std::vector< std::shared_ptr< CSQLiteItem> > > && vecRows);
+    CSQLiteTable() {}
 	~CSQLiteTable();
-private:
-	std::unique_ptr<CSQLiteResult> m_upSQLiteResult;
-};
-#endif
 
-class CSQLiteDBDecorator;
+    void deserialize(CArchieve & ar);
+    void serialize(CArchieve & ar);
+private:
+    std::vector< std::vector< std::shared_ptr< CSQLiteItem> > >  m_vecRows;
+    std::vector<std::string> m_vecFields;
+};
+
 class CSQLiteDatabase : public CSQLiteObject
 {
 	CSQLiteDatabase(const CSQLiteDatabase&);
 	CSQLiteDatabase& operator=(const CSQLiteDatabase&);
 public:
-	CSQLiteDatabase(const std::string& sName, const std::vector<shared_ptr<CSQLiteQuery> >& vecQueries);
+	CSQLiteDatabase(const std::string& sName);
 	~CSQLiteDatabase();
 
-	void deserialize()
-	{
-	}
-
-	void serialize()
-	{
-	}
-
+    CSQLiteResult Run(const CSQLiteQuery& sQuery);
 private:
-	std::vector<shared_ptr<CSQLiteQuery> > m_vecQueries;
-	std::shared_ptr<CSQLiteDBDecorator> m_spSQLLiteDB;
+    std::shared_ptr<sqlite3> m_spSqlite3;
 };
 
 #endif // _SQLLITE_OBJECT_H

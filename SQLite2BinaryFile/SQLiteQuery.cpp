@@ -1,5 +1,14 @@
 #include "SQLiteQuery.h"
 
+CSQLiteQuery::CSQLiteQuery(const std::string& strName) : m_strTable(strName) {}
+
+std::string CSQLiteQuery::GetTableName() const
+{
+    return m_strTable;
+}
+
+////////////////////////////////////////////////////////////////////////////////////
+// CSortBy
 CSortBy::CSortBy(const std::string& strSortBy) noexcept : m_strSortBy(strSortBy)
 {}
 
@@ -19,7 +28,7 @@ std::ostream& operator<< (std::ostream& stream, const CSortBy& sSort)
 }
 
 CSQLiteSelectQuery::CSQLiteSelectQuery(const std::string& strTableName, const std::vector<std::string>& vecFields, const std::string& strSortBy) noexcept
-	: m_strTable(strTableName), m_vecFields(vecFields), m_sSortBy(strSortBy), m_bFlagSet(false)
+	: CSQLiteQuery(strTableName), m_vecFields(vecFields), m_sSortBy(strSortBy), m_bFlagSet(false)
 {	
 }
 

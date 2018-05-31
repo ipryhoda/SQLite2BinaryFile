@@ -1,7 +1,7 @@
 #ifndef  _SQLLITE_ITEM_H
 #define  _SQLLITE_ITEM_H
 
-#include "Archieve.h"
+#include "Archive.h"
 #include <cstdint>
 #include <vector>
 
@@ -13,15 +13,12 @@ protected:
 	CSQLiteItem();
 public:
 	virtual ~CSQLiteItem();
+    virtual  void deserialize(CArchieve & ar) = 0;
+    virtual void serialize(CArchieve & ar) = 0;
 };
 
 template <typename Type>
-struct is_sqlite_value : public std::integral_constant<
-	bool,
-	std::is_floating_point<Type>::value
-	|| std::is_integral<Type>::value
-> { };
-
+struct is_sqlite_value : public std::integral_constant<	bool, std::is_floating_point<Type>::value || std::is_integral<Type>::value> { };
 template<typename numeric_t>
 class CSQLiteNumericItem : public CSQLiteItem
 {
@@ -30,15 +27,19 @@ class CSQLiteNumericItem : public CSQLiteItem
 	CSQLiteNumericItem& operator=(const CSQLiteNumericItem<numeric_t>&) {}
 public:
 	CSQLiteNumericItem(type_t value) : m_value(value) {}
+    CSQLiteNumericItem() {}
 	~CSQLiteNumericItem() {}
 
-	void deserialize()
-	{
-	}
+    void deserialize(CArchieve & ar)
+    {
+        ar.load(m_value);
+    }
 
-	void serialize()
-	{
-	}
+    void serialize(CArchieve & ar)
+    {
+        ar.store(m_value);
+    }
+
 private:
 	type_t m_value;
 };
@@ -49,16 +50,11 @@ class CSQLLiteBinaryItem : public CSQLiteItem
 	CSQLLiteBinaryItem& operator=(const CSQLLiteBinaryItem&);
 public:
 	CSQLLiteBinaryItem(const std::uint8_t* pv, size_t iBytesCount);
+    CSQLLiteBinaryItem() {}
 	~CSQLLiteBinaryItem();
-	// Overriden
-	void deserialize()
-	{
-	}
 
-	void serialize()
-	{
-	}
-
+    void deserialize(CArchieve & ar);
+    void serialize(CArchieve & ar);
 private:
 	std::vector<std::uint8_t> m_vec;
 };
@@ -70,15 +66,17 @@ class CSQLLiteStringItem : public CSQLiteItem
 	CSQLLiteStringItem<char_t>& operator=(const CSQLLiteStringItem<char_t>&);
 public:
 	CSQLLiteStringItem(const std::basic_string<char_t>& sText) : m_sText(sText) {}
+    CSQLLiteStringItem() {}
 	~CSQLLiteStringItem() {}
 
-	void deserialize()
-	{
-	}
-
-	void serialize()
-	{
-	}
+    void deserialize(CArchieve & ar)
+    {
+        ar.load(m_sText);
+    }
+    void serialize(CArchieve & ar)
+    {
+        ar.store(m_sText);
+    }
 private:
 	std::basic_string<char_t> m_sText;
 };
@@ -91,13 +89,8 @@ public:
 	CSQLLiteNullItem();
 	~CSQLLiteNullItem();
 
-	void deserialize()
-	{
-	}
-
-	void serialize()
-	{
-	}
+    void deserialize(CArchieve & ar);
+    void serialize(CArchieve & ar);
 };
 
 #endif // _SQLLITE_ITEM_H

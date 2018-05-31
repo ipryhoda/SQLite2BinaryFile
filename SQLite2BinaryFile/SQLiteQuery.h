@@ -1,7 +1,7 @@
 #ifndef  _SQLLITE_QUERY_H
 #define  _SQLLITE_QUERY_H
 
-#include "Archieve.h"
+#include "Archive.h"
 
 #include <string>
 #include <vector>
@@ -11,14 +11,15 @@
 
 using namespace std;
 
-class CSQLiteDBDecorator;
 class CSQLiteQuery
 {	
 	CSQLiteQuery(const CSQLiteQuery&);
 	CSQLiteQuery& operator=(const CSQLiteQuery&) {}
 protected:
-	CSQLiteQuery() {}
+    CSQLiteQuery(const std::string& strName);
+    std::string m_strTable;
 public:
+    std::string GetTableName() const;
 	virtual ~CSQLiteQuery() {};
 	virtual std::string ToString() const = 0;
 };
@@ -48,19 +49,8 @@ public:
 	~CSQLiteSelectQuery() {}
 
 	virtual std::string ToString() const;
-
-	void deserialize()
-	{
-		return;
-	}
-
-	void serialize()
-	{
-		return;
-	}
 protected:
 	std::vector<std::string> m_vecFields;
-	std::string m_strTable;
 	CSortBy m_sSortBy;
 	bool m_bFlagSet;
 };

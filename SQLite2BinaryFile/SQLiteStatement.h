@@ -9,7 +9,7 @@ class CSQLiteStatement
 	CSQLiteStatement(const CSQLiteStatement&) {}
 	CSQLiteStatement& operator=(const CSQLiteStatement&) {}
 public:
-	CSQLiteStatement() : _pStmt(nullptr)
+	CSQLiteStatement() noexcept : _pStmt(nullptr)
 	{}
 
 	CSQLiteStatement(CSQLiteStatement&& other)
