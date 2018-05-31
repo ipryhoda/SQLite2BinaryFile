@@ -14,15 +14,15 @@ CSQLiteResult::~CSQLiteResult()
 
 std::unique_ptr<CSQLiteTable> CSQLiteResult::Get()
 {
-    std::vector< std::vector<std::shared_ptr< CSQLiteItem> > >  vecRows;
-    std::vector< std::string> vecFields;
+    std::vector<std::string> vecFields;
+    std::vector<CSQLiteRow>  vecRows;
 
     bool bFirstCall = false;
 	int rc = SQLITE_OK;
 
 	while ((rc = sqlite3_step(m_sSQLStmt)) == SQLITE_ROW)
 	{
-		std::vector<std::shared_ptr<CSQLiteItem> > vecItems;
+        std::vector< CSQLiteRow::TSharedPtrRowItem > vecItems;
 		for (int i = 0; i < sqlite3_column_count(m_sSQLStmt); ++i)
 		{
 			int iColumnType = ::sqlite3_column_type(m_sSQLStmt, i);
@@ -35,28 +35,33 @@ std::unique_ptr<CSQLiteTable> CSQLiteResult::Get()
 			{
 				case SQLITE_INTEGER:
 				{
-					vecItems.push_back(std::make_shared<CSQLiteNumericItem<int64_t>>(sqlite3_column_int(m_sSQLStmt, i)));
+					vecItems.push_back(CSQLiteRow::TSharedPtrRowItem (SQLITE_INTEGER,
+                        std::make_shared<CSQLiteNumericItem<int64_t>>(sqlite3_column_int(m_sSQLStmt, i))));
 					break;
 				}
 				case SQLITE_FLOAT:
 				{
-					vecItems.push_back(std::make_shared<CSQLiteNumericItem<double>>(sqlite3_column_double(m_sSQLStmt, i)));
+					vecItems.push_back(CSQLiteRow::TSharedPtrRowItem(SQLITE_FLOAT,
+                        std::make_shared<CSQLiteNumericItem<double>>(sqlite3_column_double(m_sSQLStmt, i))));
 					break;
 				}
 				case SQLITE_BLOB:
 				{
 					const std::uint8_t* ui8Blob = reinterpret_cast<const std::uint8_t*>(::sqlite3_column_blob(m_sSQLStmt, i));
-					vecItems.push_back(std::make_shared<CSQLLiteBinaryItem>(ui8Blob, sqlite3_column_bytes(m_sSQLStmt, i)));
+                    vecItems.push_back(CSQLiteRow::TSharedPtrRowItem(SQLITE_BLOB,
+                        std::make_shared<CSQLLiteBinaryItem>(ui8Blob, sqlite3_column_bytes(m_sSQLStmt, i))));
 					break;
 				}
 				case SQLITE_TEXT:
 				{
 					std::string sText(reinterpret_cast<const char*>(::sqlite3_column_text(m_sSQLStmt, i)));
-					vecItems.push_back(std::make_shared<CSQLLiteStringItem<char> >(sText));
+                    vecItems.push_back(CSQLiteRow::TSharedPtrRowItem(SQLITE_TEXT,
+                        std::make_shared<CSQLLiteStringItem<char> >(sText)));
 					break;
 				}
 				case SQLITE_NULL:
-					vecItems.push_back(std::make_shared<CSQLLiteNullItem>());
+                    vecItems.push_back(CSQLiteRow::TSharedPtrRowItem(SQLITE_NULL,
+                        std::make_shared<CSQLLiteNullItem>()));
 					break;
 				default:
 					throw std::runtime_error("Unsupported SQL type handling");

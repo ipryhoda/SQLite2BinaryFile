@@ -9,6 +9,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <utility>
 
 class CSQLiteObject
 {
@@ -27,20 +28,40 @@ protected:
 	std::string m_strName;
 };
 
+class CSQLiteRow
+{
+    CSQLiteRow(const CSQLiteRow&);
+    CSQLiteRow& operator=(const CSQLiteRow&);
+
+public:
+    typedef std::pair<std::uint8_t, std::shared_ptr< CSQLiteItem> > TSharedPtrRowItem;
+    CSQLiteRow(std::vector< TSharedPtrRowItem > &&);
+    CSQLiteRow(CSQLiteRow &&);
+    CSQLiteRow() {}
+
+    void deserialize(CArchieve & ar);
+    void serialize(CArchieve & ar);
+    friend std::ostream& operator<< (std::ostream& stream, const CSQLiteRow& sRow);
+private:
+    std::vector< TSharedPtrRowItem > m_vecItems;
+};
+
 class CSQLiteTable : public CSQLiteObject
 {
 	CSQLiteTable(const CSQLiteTable&);
 	CSQLiteTable& operator=(const CSQLiteTable&);
 public:
-	CSQLiteTable(const std::string& sName, std::vector<string> && vecFields, std::vector< std::vector< std::shared_ptr< CSQLiteItem> > > && vecRows);
+	CSQLiteTable(const std::string& sName, std::vector<string> && vecFields, std::vector<CSQLiteRow> && vecRows);
     CSQLiteTable() {}
 	~CSQLiteTable();
 
     void deserialize(CArchieve & ar);
     void serialize(CArchieve & ar);
+    void print(std::ostream& stream, size_t uiRowCount = -1);
+    friend std::ostream& operator<< (std::ostream& stream, const CSQLiteTable& sTable);
 private:
-    std::vector< std::vector< std::shared_ptr< CSQLiteItem> > >  m_vecRows;
     std::vector<std::string> m_vecFields;
+    std::vector<CSQLiteRow>  m_vecRows;
 };
 
 class CSQLiteDatabase : public CSQLiteObject

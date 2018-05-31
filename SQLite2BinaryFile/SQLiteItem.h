@@ -1,9 +1,12 @@
 #ifndef  _SQLLITE_ITEM_H
 #define  _SQLLITE_ITEM_H
 
+#include "SQLitePrint.h"
 #include "Archive.h"
 #include <cstdint>
 #include <vector>
+#include <memory>
+#include <string>
 
 class CSQLiteItem
 {
@@ -15,6 +18,7 @@ public:
 	virtual ~CSQLiteItem();
     virtual  void deserialize(CArchieve & ar) = 0;
     virtual void serialize(CArchieve & ar) = 0;
+    virtual void Print(std::ostream& stream) = 0;
 };
 
 template <typename Type>
@@ -40,6 +44,11 @@ public:
         ar.store(m_value);
     }
 
+    void Print(std::ostream& stream)
+    {
+        AdjustWeightLeftPrint(stream, std::to_string((type_t)m_value));
+    }
+
 private:
 	type_t m_value;
 };
@@ -55,6 +64,7 @@ public:
 
     void deserialize(CArchieve & ar);
     void serialize(CArchieve & ar);
+    void Print(std::ostream& stream);
 private:
 	std::vector<std::uint8_t> m_vec;
 };
@@ -77,6 +87,11 @@ public:
     {
         ar.store(m_sText);
     }
+
+    void Print(std::ostream& stream)
+    {
+        AdjustWeightLeftPrint(stream, m_sText);
+    }
 private:
 	std::basic_string<char_t> m_sText;
 };
@@ -91,6 +106,11 @@ public:
 
     void deserialize(CArchieve & ar);
     void serialize(CArchieve & ar);
+    void Print(std::ostream& stream);
 };
+
+
+std::ostream& operator<< (std::ostream& stream, const CSQLiteItem& sSQLitem);
+std::shared_ptr<CSQLiteItem> construct(std::uint8_t ui8Type);
 
 #endif // _SQLLITE_ITEM_H

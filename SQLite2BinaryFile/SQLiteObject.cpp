@@ -1,4 +1,5 @@
 #include "SQLiteObject.h"
+#include "SQLitePrint.h"
 #include <iomanip>
 
 CSQLiteObject::CSQLiteObject(CSQLiteObject&& other)
@@ -23,8 +24,55 @@ std::ostream& operator<< (std::ostream& stream, const CSQLiteObject& sObject)
 	return stream;
 }
 ////////////////////////////////////////////////////////////////////////////////////
+// CSQLiteRow
+CSQLiteRow::CSQLiteRow(CSQLiteRow && other)
+{
+    m_vecItems = std::move(other.m_vecItems);
+}
+
+CSQLiteRow::CSQLiteRow(std::vector< TSharedPtrRowItem > && vecOther)
+{
+    m_vecItems = std::move(vecOther);
+}
+
+void CSQLiteRow::deserialize(CArchieve & ar)
+{
+    std::uint64_t uiSize = 0;
+    ar.load(uiSize);
+    for (size_t i = 0; i < uiSize; ++i)
+    {
+        std::uint8_t ui8Type = 0;
+        ar.load(ui8Type);
+
+        std::shared_ptr<CSQLiteItem> spItem = construct(ui8Type);
+
+        spItem->deserialize(ar);
+        m_vecItems.push_back(TSharedPtrRowItem(ui8Type, spItem));
+    }
+}
+
+void CSQLiteRow::serialize(CArchieve & ar)
+{
+    ar.store((std::uint64_t)m_vecItems.size());
+    for (auto& itPair : m_vecItems)
+    {
+        ar.store(itPair.first);
+        itPair.second->serialize(ar);
+    }
+}
+
+std::ostream& operator<< (std::ostream& stream, const CSQLiteRow& sRow)
+{
+    for (auto & itItems : sRow.m_vecItems)
+    {
+        itItems.second->Print(stream);
+    }
+
+    return stream;
+}
+////////////////////////////////////////////////////////////////////////////////////
 // CSQLiteTable
-CSQLiteTable::CSQLiteTable(const std::string& strName, std::vector<string> && vecFields, std::vector<std::vector< std::shared_ptr< CSQLiteItem> > > && vecRows) :
+CSQLiteTable::CSQLiteTable(const std::string& strName, std::vector<string> && vecFields, std::vector<CSQLiteRow> && vecRows) :
     CSQLiteObject(strName), m_vecFields(std::move(vecFields)), m_vecRows(std::move(vecRows))
 {}
 
@@ -37,60 +85,17 @@ void CSQLiteTable::deserialize(CArchieve & ar)
     CSQLiteObject::deserialize(ar);
     ar.load(m_vecFields);
     
-    size_t uiRowCount = 0;
+    std::uint64_t uiRowCount = 0;
     ar.load(uiRowCount);
-    for (size_t i = 0; i < uiRowCount; ++i)
-    {
-        std::vector< std::shared_ptr< CSQLiteItem> > vecRowItems;
-        for (size_t j = 0; j < m_vecFields.size(); ++j)
-        {
-            switch (m_vecFields[j].GetType())
-            {
-                case SQLITE_INTEGER:
-                {
-                    std::shared_ptr<CSQLiteNumericItem<int64_t> > spItem(std::make_shared<CSQLiteNumericItem<int64_t> >());
-                    spItem->deserialize(ar);
-                    vecRowItems.push_back(spItem);
-                    break;
-                }
-                case SQLITE_FLOAT:
-                {
-                    std::shared_ptr<CSQLiteNumericItem<double> > spItem(std::make_shared<CSQLiteNumericItem<double> >());
-                    spItem->deserialize(ar);
-                    vecRowItems.push_back(spItem);
-                    break;
-                }
-                case SQLITE_BLOB:
-                {
-                    std::shared_ptr<CSQLLiteBinaryItem > spItem(std::make_shared<CSQLLiteBinaryItem>());
-                    spItem->deserialize(ar);
-                    vecRowItems.push_back(spItem);
-                    break;
-                }
-                case SQLITE_TEXT:
-                {
-                    std::shared_ptr<CSQLLiteStringItem<char> > spItem(std::make_shared<CSQLLiteStringItem<char>>());
-                    spItem->deserialize(ar);
-                    vecRowItems.push_back(spItem);
-                    break;
-                }
-                case SQLITE_NULL:
-                {
-                    std::shared_ptr<CSQLLiteNullItem> spItem(std::make_shared<CSQLLiteNullItem>());
-                    spItem->deserialize(ar);
-                    vecRowItems.push_back(spItem);
-                    break;
-                }
-                default:
-                {
-                    throw std::runtime_error("Unsupported SQL type handling");
-                    break;
-                }
-            }
-        }
 
-        m_vecRows.push_back(std::move(vecRowItems));
+    for (size_t i = 0; i < uiRowCount; ++i)
+    {   
+        CSQLiteRow sSQLiteRow;
+
+        sSQLiteRow.deserialize(ar);
+        m_vecRows.push_back(std::move(sSQLiteRow));
     }
+
 }
 
 void CSQLiteTable::serialize( CArchieve & ar)
@@ -98,15 +103,55 @@ void CSQLiteTable::serialize( CArchieve & ar)
     CSQLiteObject::serialize(ar);
     ar.store(m_vecFields);
 
-    ar.store(m_vecRows.size());
+    ar.store((std::uint64_t)m_vecRows.size());
+
     for (auto& itRow : m_vecRows)
-    {        
-        for (auto itItem : itRow)
-        {
-            itItem->serialize(ar);
-        }
+    {
+        itRow.serialize(ar);
     }
 }
+
+void CSQLiteTable::print(std::ostream& stream, size_t uiRowCount)
+{
+    std::ios_base::fmtflags format(stream.flags());
+    stream << "========================================" << std::setw(20) << centered(m_strName) << "========================================" << std::endl;
+    for (auto & itField : m_vecFields)
+    {
+        AdjustWeightLeftPrint(stream, itField);
+    }
+
+    stream << std::endl;
+    stream << "---------------------------------------------------------------------------------------------------" << std::endl;
+
+    int iCount = 0;
+    for (auto & itRow : m_vecRows)
+    {
+        if (iCount == uiRowCount) break;
+        stream << itRow << std::endl;
+        iCount++;
+    }
+
+    stream.flags(format);
+
+}
+
+std::ostream& operator<< (std::ostream& stream, const CSQLiteTable& sTable)
+{
+    for(auto & itField : sTable.m_vecFields)
+    {
+        AdjustWeightLeftPrint(stream, itField);
+    }
+
+    stream << std::endl;
+
+    for (auto & itRow : sTable.m_vecRows)
+    {
+        stream << itRow << std::endl;
+    }
+
+    return stream;
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////////
 // CSQLiteDatabase

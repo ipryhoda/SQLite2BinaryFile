@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<requests>
+  <table name="albums" >
+    <field name="*" />
+  </table>
+  <table name="artists" >
+    <field name="*" />
+  </table>
+  <table name="customers" >
+    <field name="*" />
+  </table>
+  <table name="genres" >
+    <field name="*" />
+  </table>
+  <table name="invoices" >
+    <field name="*" />
+  </table>
+  <table name="invoice_items" >
+    <field name="*" />
+  </table>
+  <table name="media_types" >
+    <field name="*" />
+  </table>
+  <table name="playlists" >
+    <field name="*" />
+  </table>
+  <table name="playlist_track" >
+    <field name="*" />
+  </table>
+  <table name="tracks" >
+    <field name="*" />
+  </table>
+</requests>
+

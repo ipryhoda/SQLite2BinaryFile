@@ -4,6 +4,7 @@
 #include "SQLite2BinaryFile.h"
 #include "SQLiteObject.h"
 #include "SQLiteQuery.h"
+#include "SQLiteSchema.h"
 
 #include <fstream>
 #include <memory>
@@ -24,12 +25,14 @@ void PrintUsage()
 
 int main(int argc, char *argv[])
 {
-    const std::string strDbPath("C:\\SQLite\\db\\chinook.db");
-    const std::string strSqlDump("D:\\SQLDump.dump");
+    const std::string strDbPath("F:\\chinook.db");
+    const std::string strXmlPath("F:\\schema.xml");
+    const std::string strSqlDump("F:\\SQLDump.dump");
     int iExitCode = OK;
     try
     {
-        std::vector< std::shared_ptr< CSQLiteQuery> > vecSQLQueries{ std::make_shared<CSQLiteSelectQuery>("albums", std::initializer_list<std::string>{ "*" }, "")
+#if 0
+        std::vector< std::shared_ptr<CSQLiteQuery> > vecSQLQueries{ std::make_shared<CSQLiteSelectQuery>("albums", std::initializer_list<std::string>{ "*" }, "")
             , std::make_shared<CSQLiteSelectQuery>("artists", std::initializer_list<std::string>{ "*" }, "")
             , std::make_shared<CSQLiteSelectQuery>("customers", std::initializer_list<std::string>{ "*" }, "") 
             , std::make_shared<CSQLiteSelectQuery>("employees", std::initializer_list<std::string>{ "*" }, "") 
@@ -40,9 +43,15 @@ int main(int argc, char *argv[])
             , std::make_shared<CSQLiteSelectQuery>("playlists", std::initializer_list<std::string>{ "*" }, "")
             , std::make_shared<CSQLiteSelectQuery>("playlist_track", std::initializer_list<std::string>{ "*" }, "")
             , std::make_shared<CSQLiteSelectQuery>("tracks", std::initializer_list<std::string>{ "*" }, "") };
-#if 1
+#else
+        std::vector< std::shared_ptr<CSQLiteQuery> > vecSQLQueries;
+        CSQLiteSchema sSQLSchema(strXmlPath);
+        sSQLSchema.Parse(vecSQLQueries);
+#endif
+
+#if 0
         std::shared_ptr<CArchieve> spArchive(new CBinaryFileArchive(strSqlDump, CBinaryFileArchive::WRITE));
-        spArchive->store(vecSQLQueries.size());
+        spArchive->store((std::uint64_t)vecSQLQueries.size());
 
         CSQLiteDatabase sSqliteDb(strDbPath);
         for (auto& it : vecSQLQueries)
@@ -63,6 +72,7 @@ int main(int argc, char *argv[])
         {
             std::shared_ptr<CSQLiteTable> spTable(std::make_shared<CSQLiteTable>());
             spTable->deserialize(*spArchive);
+            spTable->print(std::cout, 5);
             vecTables.push_back(spTable);
         }
 #endif
