@@ -2,7 +2,7 @@
 #define  _SQLLITE_STATEMENT_H
 
 //SQLite Header and library
-#include "SQLite\sqlite3.h"
+#include "SQLite/sqlite3.h"
 
 class CSQLiteStatement
 {
