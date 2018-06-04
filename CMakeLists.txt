@@ -6,4 +6,4 @@ cmake_minimum_required (VERSION 3.7)
 project ("SQLite2BinaryFile")
 
 # Include sub-projects.
-add_subdirectory ("SQLite2BinaryFile")
+add_subdirectory ("src")
