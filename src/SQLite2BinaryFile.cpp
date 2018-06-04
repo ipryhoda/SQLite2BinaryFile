@@ -29,6 +29,7 @@ void PrintUsage()
     std::cout << std::endl;
 }
 
+
 void sqlite2file_main(int argc, char *argv[])
 {
     std::vector<std::string> vecArguments;
@@ -40,6 +41,11 @@ void sqlite2file_main(int argc, char *argv[])
     for (int i = 1; i < argc; ++i)
     {
         vecArguments.push_back(argv[i]);
+        if (IsHelp(argv[i]))
+        {
+            PrintUsage();
+            return;
+        }
     }
 
     CSQLiteCommandLine sCmd(vecArguments);
@@ -95,8 +101,8 @@ int main(int argc, char *argv[])
     catch (const command_line_parse_error& ex)
     {
         std::cerr << "ERROR: " << ex.what() << std::endl << std::endl;
-        iExitCode = ERROR;
-        PrintUsage();
+        std::cerr << "Use -help option for details." << std::endl;
+        iExitCode = ERROR;        
     }
     catch (const std::exception& ex)
     {

@@ -10,6 +10,22 @@ bool IsOption(const std::string& strArg, std::string& strOption)
         strOption = strArg.substr(1);
         return true;
     }
+
+    return false;
+}
+
+bool IsHelp(const std::string& strOption)
+{
+    std::string strHelp;
+
+    if (IsOption(strOption, strHelp))
+    {
+        if (!strHelp.compare(STR_HELP))
+        {
+            return true;
+        }
+    }
+
     return false;
 }
 

@@ -12,6 +12,9 @@
 #define STR_SERIALIZE   "serialize"
 #define STR_VERIFY      "verify"
 #define STR_SOURCE      "source"
+#define STR_HELP        "help"
+
+bool IsHelp(const std::string& strArg);
 
 class command_line_parse_error : public std::runtime_error
 {
