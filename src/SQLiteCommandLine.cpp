@@ -1,6 +1,7 @@
 #include "SQLiteCommandLine.h"
 #include <utility>
 #include <cassert>
+#include <string.h>
 
 bool IsOption(const std::string& strArg, std::string& strOption)
 {
