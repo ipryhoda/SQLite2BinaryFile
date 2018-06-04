@@ -4,12 +4,13 @@
 cmake_minimum_required (VERSION 3.7)
 
 # Add source to this project's executable.
-add_executable (SQLite2BinaryFile "SQLite2BinaryFile.cpp" "SQLite2BinaryFile.h" 
+add_executable (sqlite2file "SQLite2BinaryFile.cpp" "SQLite2BinaryFile.h" 
                                 "SQLiteQuery.cpp" "SQLiteQuery.h"
                                 "SQLiteItem.cpp" "SQLiteItem.h"
                                 "SQLiteObject.cpp" "SQLiteObject.h"
                                 "SQLiteResult.cpp" "SQLiteResult.h"
                                 "SQLiteSchema.cpp" "SQLiteSchema.h"
+                                "SQLiteCommandLine.cpp" "SQLiteCommandLine.h"
                                 "Archive.cpp" "Archive.h"
                                 "SQLite/sqlite3.c" "SQLite/sqlite3.h"
 								"rapidxml/rapidxml.hpp" "rapidxml/rapidxml_iterators.hpp" "rapidxml/rapidxml_print.hpp" "rapidxml/rapidxml_utils.hpp")

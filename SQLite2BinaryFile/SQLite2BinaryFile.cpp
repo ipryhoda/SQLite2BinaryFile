@@ -19,7 +19,12 @@ enum EXIT_CODE
 void PrintUsage()
 {
     std::cout << "Usage:" << std::endl;
-    std::cout << "SQLite2BinaryFile.exe -x <xml path> [-s <sqlite db path> | -f <binary file> [-t <table> -r <records count>]]" << std::endl;
+    std::cout << "sqlite2file -b|-r -s <binary file> [-xml <xml path='./config/schema.xml'>] [-show <records count>] [<db source file>]" << std::endl << std::endl;
+    std::cout << "Examples:" << std::endl;
+    std::cout << "Backup/serialize sqlite db ('./SQLite/db/chinook.db') into binary file ('./saveset.sav'):" << std::endl << std::endl;
+    std::cout << "sqlite2file -b -s './saveset.sav' './SQLite/db/chinook.db'" << std::endl;
+    std::cout << "Restore/deserialize binary file ('./saveset.sav') and show up to 20 entries:" << std::endl << std::endl;
+    std::cout << "sqlite2file -r -s './saveset.sav' -show 20" << std::endl;
     std::cout << std::endl;
 }
 
