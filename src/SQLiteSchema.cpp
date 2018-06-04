@@ -35,7 +35,7 @@ void CSQLiteSchema::Parse(std::vector<std::shared_ptr<CSQLiteQuery>>& vecSQLQuer
         }
 
         std::vector<std::string> vecFields;
-        for (rapidxml::xml_node<> * pField = pTable->first_node("field"); pField; pField = pField->next_sibling())
+        for (rapidxml::xml_node<> * pField = pTable->first_node("field"); pField; pField = pField->next_sibling("field"))
         {
             const auto& pFieldName = pField->first_attribute("name");
             if (pFieldName)

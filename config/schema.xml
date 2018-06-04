@@ -7,7 +7,10 @@
     <field name="*" />
   </table>
   <table name="customers" >
-    <field name="*" />
+    <field name="CustomerId" />
+    <field name="FirstName" />
+    <field name="LastName" />
+    <sortby name="CustomerId" />
   </table>
   <table name="genres" >
     <field name="*" />

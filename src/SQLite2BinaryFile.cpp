@@ -20,12 +20,12 @@ enum EXIT_CODE
 void PrintUsage()
 {
     std::cout << "Usage:" << std::endl;
-    std::cout << "sqlite2file -a serialize|verify -saveset <binary file> [-xmlfile <xml path>] [-show <records count>] [<db source file>]" << std::endl << std::endl;
+    std::cout << "sqlite2file -action serialize|verify -saveset <binary file> [-xmlfile <xml path>] [-show <records count>] [<db source file>]" << std::endl << std::endl;
     std::cout << "Examples:" << std::endl;
     std::cout << "Serialize sqlite db ('./SQLite/db/chinook.db') into binary file ('./saveset.sav'):" << std::endl << std::endl;
-    std::cout << "sqlite2file -a serialize -saveset './saveset.sav' -xmlfile './config/schema.xml' './SQLite/db/chinook.db'" << std::endl;
+    std::cout << "sqlite2file -action serialize -saveset './saveset.sav' -xmlfile './config/schema.xml' './SQLite/db/chinook.db'" << std::endl;
     std::cout << "Verify binary file ('./saveset.sav') and show up to 20 entries:" << std::endl << std::endl;
-    std::cout << "sqlite2file -a verify -saveset './saveset.sav' -show 20" << std::endl;
+    std::cout << "sqlite2file -action verify -saveset './saveset.sav' -show 20" << std::endl;
     std::cout << std::endl;
 }
 
@@ -37,7 +37,7 @@ void sqlite2file_main(int argc, char *argv[])
         throw std::runtime_error("not enought arugments");
     }
 
-    for (size_t i = 1; i < argc; ++i)
+    for (int i = 1; i < argc; ++i)
     {
         vecArguments.push_back(argv[i]);
     }
@@ -69,9 +69,9 @@ void sqlite2file_main(int argc, char *argv[])
     {
         std::shared_ptr<CArchieve> spArchive(new CBinaryFileArchive(sCmd.GetSaveset(), CBinaryFileArchive::READ));
         std::vector<std::shared_ptr<CSQLiteTable> > vecTables;
-        size_t iTableCount = 0;
-        spArchive->load(iTableCount);
-        for (size_t i = 0; i < iTableCount; ++i)
+        std::uint64_t ui64TableCount = 0;
+        spArchive->load(ui64TableCount);
+        for (std::uint64_t i = 0; i < ui64TableCount; ++i)
         {
             std::shared_ptr<CSQLiteTable> spTable(std::make_shared<CSQLiteTable>());
             spTable->deserialize(*spArchive);

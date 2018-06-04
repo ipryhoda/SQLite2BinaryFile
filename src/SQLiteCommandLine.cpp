@@ -78,7 +78,7 @@ void CSQLiteCommandLine::Parse()
         {
             if (IsOption(it, strOption))
             {
-                if (strOption.compare("a") == 0)
+                if (strOption.compare(STR_ACTION) == 0)
                 {
                     eWaitingFor = waitforActionType;
                 }
