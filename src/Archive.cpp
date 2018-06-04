@@ -11,6 +11,11 @@ CBinaryFileArchive::CBinaryFileArchive(const std::string& sFilePath, MODE eMode)
     {
         m_stream.open(sFilePath, ios::binary | ios::out);
     }
+
+    if (!m_stream.is_open())
+    {
+        throw std::runtime_error("Failed to open file - " + sFilePath);
+    }
 }
 
 CBinaryFileArchive::~CBinaryFileArchive()

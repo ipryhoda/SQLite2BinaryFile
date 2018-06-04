@@ -2,10 +2,13 @@
 #include <utility>
 #include <cassert>
 
-bool IsOption(const std::string& strArg)
+bool IsOption(const std::string& strArg, std::string& strOption)
 {
-    if ((strArg[0] == L'/') || (strArg[0] != L'-'))
+    if ((strArg[0] == '/') || (strArg[0] == '-'))
+    {
+        strOption = strArg.substr(1);
         return true;
+    }
     return false;
 }
 
@@ -65,6 +68,7 @@ void CSQLiteCommandLine::Parse()
     EActionType eActionToDo = acttypNone;
 
     UActionParams actparams;
+    std::string strOption;
     memset(&actparams, 0, sizeof(actparams));
     for (auto& it : m_vecOptions)
     {
@@ -72,35 +76,35 @@ void CSQLiteCommandLine::Parse()
         {
         case(waitforActionSwitch):
         {
-            if (IsOption(it) && it.compare("a") == 0)
+            if (IsOption(it, strOption))
             {
-                eWaitingFor = waitforActionType;
+                if (strOption.compare("a") == 0)
+                {
+                    eWaitingFor = waitforActionType;
+                }
             }
             break;
         }
 
         case(waitforActionType):
         {
-            if (IsOption(it) && it.compare("a") == 0)
+            if (it.compare(STR_SERIALIZE) == 0)
             {
-                if (it.compare(STR_SERIALIZE) == 0)
-                {
-                    actparams.waitforSerialization = TSerialization_Action::waitforSwitch;
-                    eActionToDo = acttypSerialize;
-                }
-                if (it.compare(STR_VERIFY) == 0)
-                {
-                    actparams.waitforVerificaiton = TVerification_Action::waitforSwitch;
-                    eActionToDo = acttypVerify;
-                }
-                else
-                {
-                    throw command_line_parse_error("Invalid operation type");
-                }
-
-                m_handled.emplace(std::make_pair(STR_ACTION, it));
-                eWaitingFor = waitforActionSpecificParams;
+                actparams.waitforSerialization = TSerialization_Action::waitforSwitch;
+                eActionToDo = acttypSerialize;
             }
+            else if (it.compare(STR_VERIFY) == 0)
+            {
+                actparams.waitforVerificaiton = TVerification_Action::waitforSwitch;
+                eActionToDo = acttypVerify;
+            }
+            else
+            {
+                throw command_line_parse_error("Invalid operation type - " + it);
+            }
+
+            m_handled.emplace(std::make_pair(STR_ACTION, it));
+            eWaitingFor = waitforActionSpecificParams;
             break;
         }
         case(waitforActionSpecificParams):
@@ -113,19 +117,19 @@ void CSQLiteCommandLine::Parse()
                 {
                 case(TSerialization_Action::waitforSwitch):
                 {
-                    if (IsOption(it))
+                    if (IsOption(it, strOption))
                     {
-                        if (it.compare(STR_XML_FILE) == 0)
+                        if (strOption.compare(STR_XML_FILE) == 0)
                         {
                             actparams.waitforSerialization = TSerialization_Action::waitforXmlFile;
                         }
-                        else if (it.compare(STR_SAVESET) == 0)
+                        else if (strOption.compare(STR_SAVESET) == 0)
                         {
                             actparams.waitforSerialization = TSerialization_Action::waitforSaveset;
                         }
                         else
                         {
-                            throw command_line_parse_error("Invalid option for serialization");
+                            throw command_line_parse_error("Invalid option for serialization. Unknown option - " + strOption);
                         }
                     }
                     else
@@ -137,13 +141,13 @@ void CSQLiteCommandLine::Parse()
                 }
                 case(TSerialization_Action::waitforXmlFile):
                 {
-                    if (!IsOption(it))
+                    if (!IsOption(it, strOption))
                     {
                         m_handled.emplace(std::make_pair(STR_XML_FILE, it));
                     }
                     else
                     {
-                        throw command_line_parse_error("Invalid value for xml file. Seems to be the option name");
+                        throw command_line_parse_error("Invalid value for xml file. Seems to be the option name - " + it);
                     }
 
                     actparams.waitforSerialization = TSerialization_Action::waitforSwitch;
@@ -151,13 +155,13 @@ void CSQLiteCommandLine::Parse()
                 }
                 case(TSerialization_Action::waitforSaveset):
                 {
-                    if (!IsOption(it))
+                    if (!IsOption(it, strOption))
                     {
                         m_handled.emplace(std::make_pair(STR_SAVESET, it));
                     }
                     else
                     {
-                        throw command_line_parse_error("Invalid value for saveset file. Seems to be the option name");
+                        throw command_line_parse_error("Invalid value for saveset file. Seems to be the option name - " + it);
                     }
 
                     actparams.waitforSerialization = TSerialization_Action::waitforSwitch;
@@ -175,31 +179,31 @@ void CSQLiteCommandLine::Parse()
                 {
                 case(TVerification_Action::waitforSwitch):
                 {
-                    if (IsOption(it))
+                    if (IsOption(it, strOption))
                     {
-                        if (it.compare(STR_SHOW) == 0)
-                        {
-                            actparams.waitforVerificaiton = TVerification_Action::waitforShow;
-                        }
-                        else if (it.compare(STR_SAVESET) == 0)
+                        if (strOption.compare(STR_SAVESET) == 0)
                         {
                             actparams.waitforVerificaiton = TVerification_Action::waitforSaveset;
                         }
+                        else if (strOption.compare(STR_SHOW) == 0)
+                        {
+                            actparams.waitforVerificaiton = TVerification_Action::waitforShow;
+                        }
                         else
                         {
-                            throw command_line_parse_error("Invalid option for verifications");
+                            throw command_line_parse_error("Invalid option for verifications. Unknown option - " + strOption);
                         }
                     }
                     else
                     {
-                        throw command_line_parse_error("Invalid option is set for varification");
+                        throw command_line_parse_error("Invalid option is set for varification. It's not an option - " + it);
                     }
 
                     break;
                 }
                 case(TVerification_Action::waitforShow):
                 {
-                    if (!IsOption(it))
+                    if (!IsOption(it, strOption))
                     {
                         m_handled.emplace(std::make_pair(STR_SHOW, it));
                     }
@@ -213,13 +217,13 @@ void CSQLiteCommandLine::Parse()
                 }
                 case(TVerification_Action::waitforSaveset):
                 {
-                    if (!IsOption(it))
+                    if (!IsOption(it, strOption))
                     {
                         m_handled.emplace(std::make_pair(STR_SAVESET, it));
                     }
                     else
                     {
-                        throw command_line_parse_error("Invalid value for saveset file. Seems to be the option name");
+                        throw command_line_parse_error("Invalid value for saveset file. Seems to be the option name - " + it);
                     }
 
                     actparams.waitforVerificaiton = TVerification_Action::waitforSwitch;
@@ -234,6 +238,7 @@ void CSQLiteCommandLine::Parse()
             default:
                 assert(0);
             }
+            break;
         }
         default:
             assert(0);
@@ -246,28 +251,42 @@ CSQLiteCommandLine::~CSQLiteCommandLine()
 
 std::string CSQLiteCommandLine::GetAction() const
 {
+    if (m_handled.find(STR_ACTION) == m_handled.end())
+    {
+        throw command_line_parse_error("Missed 'action' option");
+    }
+
     return m_handled.at(STR_ACTION);
 }
 
 std::string CSQLiteCommandLine::GetSaveset() const
 {
+    if (m_handled.find(STR_SAVESET) == m_handled.end())
+    {
+        throw command_line_parse_error("Missed 'saveset' option");
+    }
+
     return m_handled.at(STR_SAVESET);
 }
 
 std::string CSQLiteCommandLine::GetSource() const
 {
+    if (m_handled.find(STR_SOURCE) == m_handled.end())
+    {
+        throw command_line_parse_error("Missed 'source' option");
+    }
+
     return m_handled.at(STR_SOURCE);
 }
 
 std::string CSQLiteCommandLine::GetSchema() const
 {
-    std::string strXml = "./config/schema.xml";
-    if (m_handled.find(STR_XML_FILE) != m_handled.end())
+    if (m_handled.find(STR_XML_FILE) == m_handled.end())
     {
-        strXml = m_handled.at(STR_XML_FILE);
+        throw command_line_parse_error("Missed 'xmlfile' option");
     }
 
-    return strXml;
+    return m_handled.at(STR_XML_FILE);
 }
 
 size_t CSQLiteCommandLine::GetShowCount() const

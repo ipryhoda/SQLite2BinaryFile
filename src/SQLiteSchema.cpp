@@ -14,6 +14,10 @@ CSQLiteSchema::~CSQLiteSchema()
 void CSQLiteSchema::Parse(std::vector<std::shared_ptr<CSQLiteQuery>>& vecSQLQueries)
 {
     std::ifstream xmlstream(m_strXmlFile);
+    if (!xmlstream.is_open())
+    {
+        throw std::runtime_error("Failed to open xml file - '" + m_strXmlFile + "'");
+    }
     std::vector<char> vecBuffer((std::istreambuf_iterator<char>(xmlstream)), std::istreambuf_iterator<char>());
     vecBuffer.push_back('\0');
 

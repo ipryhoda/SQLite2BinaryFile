@@ -20,12 +20,12 @@ enum EXIT_CODE
 void PrintUsage()
 {
     std::cout << "Usage:" << std::endl;
-    std::cout << "sqlite2file -a serialize|verify -s <binary file> [-xml <xml path='./config/schema.xml'>] [-show <records count>] [<db source file>]" << std::endl << std::endl;
+    std::cout << "sqlite2file -a serialize|verify -saveset <binary file> [-xmlfile <xml path>] [-show <records count>] [<db source file>]" << std::endl << std::endl;
     std::cout << "Examples:" << std::endl;
     std::cout << "Serialize sqlite db ('./SQLite/db/chinook.db') into binary file ('./saveset.sav'):" << std::endl << std::endl;
-    std::cout << "sqlite2file -a serialize -s './saveset.sav' './SQLite/db/chinook.db'" << std::endl;
+    std::cout << "sqlite2file -a serialize -saveset './saveset.sav' -xmlfile './config/schema.xml' './SQLite/db/chinook.db'" << std::endl;
     std::cout << "Verify binary file ('./saveset.sav') and show up to 20 entries:" << std::endl << std::endl;
-    std::cout << "sqlite2file -a verify -s './saveset.sav' -show 20" << std::endl;
+    std::cout << "sqlite2file -a verify -saveset './saveset.sav' -show 20" << std::endl;
     std::cout << std::endl;
 }
 
@@ -94,7 +94,7 @@ int main(int argc, char *argv[])
     }
     catch (const command_line_parse_error& ex)
     {
-        std::cerr << "ERROR: " << ex.what() << std::endl;
+        std::cerr << "ERROR: " << ex.what() << std::endl << std::endl;
         iExitCode = ERROR;
         PrintUsage();
     }

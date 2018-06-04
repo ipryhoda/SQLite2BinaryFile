@@ -22,5 +22,6 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread" )
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ldl" )
 endif()
 
+install (TARGETS sqlite2file DESTINATION ./)
 
 # TODO: Add tests and install targets if needed.
