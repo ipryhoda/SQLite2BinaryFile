@@ -30,9 +30,16 @@ void PrintUsage()
 
 int main(int argc, char *argv[])
 {
+#if 0
     const std::string strDbPath("F:\\chinook.db");
     const std::string strXmlPath("F:\\schema.xml");
     const std::string strSqlDump("F:\\SQLDump.dump");
+#else
+    const std::string strDbPath("./SQLite/db/chinook.db");
+    const std::string strXmlPath("./config/schema.xml");
+    const std::string strSqlDump("./SQLDump.dump");
+#endif
+
     int iExitCode = OK;
     try
     {
@@ -48,12 +55,11 @@ int main(int argc, char *argv[])
             , std::make_shared<CSQLiteSelectQuery>("playlists", std::initializer_list<std::string>{ "*" }, "")
             , std::make_shared<CSQLiteSelectQuery>("playlist_track", std::initializer_list<std::string>{ "*" }, "")
             , std::make_shared<CSQLiteSelectQuery>("tracks", std::initializer_list<std::string>{ "*" }, "") };
-#else
+#endif
+
         std::vector< std::shared_ptr<CSQLiteQuery> > vecSQLQueries;
         CSQLiteSchema sSQLSchema(strXmlPath);
         sSQLSchema.Parse(vecSQLQueries);
-#endif
-
 #if 0
         std::shared_ptr<CArchieve> spArchive(new CBinaryFileArchive(strSqlDump, CBinaryFileArchive::WRITE));
         spArchive->store((std::uint64_t)vecSQLQueries.size());
@@ -68,6 +74,7 @@ int main(int argc, char *argv[])
             std::cout << "Dumping table: \""<< it->GetTableName() << "\"" << std::endl;
             upTable->serialize(*spArchive);
         }
+
 #else
         std::shared_ptr<CArchieve> spArchive(new CBinaryFileArchive(strSqlDump, CBinaryFileArchive::READ));
         std::vector<std::shared_ptr<CSQLiteTable> > vecTables;

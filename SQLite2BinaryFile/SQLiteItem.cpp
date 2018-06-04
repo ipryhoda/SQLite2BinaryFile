@@ -1,5 +1,5 @@
 #include "SQLiteItem.h"
-#include "SQLite\sqlite3.h"
+#include "SQLite/sqlite3.h"
 ////////////////////////////////////////////////////////////////////////////////////
 // CSQLiteItem
 CSQLiteItem::CSQLiteItem() 

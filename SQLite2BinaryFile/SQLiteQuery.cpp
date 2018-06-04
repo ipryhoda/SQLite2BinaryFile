@@ -29,7 +29,7 @@ std::ostream& operator<< (std::ostream& stream, const CSortBy& sSort)
 
 CSQLiteSelectQuery::CSQLiteSelectQuery(const std::string& strTableName, const std::vector<std::string>& vecFields, const std::string& strSortBy) noexcept
 	: CSQLiteQuery(strTableName), m_vecFields(vecFields), m_sSortBy(strSortBy), m_bFlagSet(false)
-{	
+{
 }
 
 #if 0
@@ -57,7 +57,7 @@ std::string CSQLiteSelectQuery::ToString() const
 	std::basic_stringstream<char> stream;
 
 	stream << "SELECT ";
-	for (auto& it = m_vecFields.begin(); it != m_vecFields.end(); ++it)
+	for (std::vector<std::string>::const_iterator it = m_vecFields.begin(); it != m_vecFields.end(); ++it)
 	{
 		stream << *it;
 		if (*it != m_vecFields.back())

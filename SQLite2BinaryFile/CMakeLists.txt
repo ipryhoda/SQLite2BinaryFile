@@ -13,7 +13,14 @@ add_executable (sqlite2file "SQLite2BinaryFile.cpp" "SQLite2BinaryFile.h"
                                 "SQLiteCommandLine.cpp" "SQLiteCommandLine.h"
                                 "Archive.cpp" "Archive.h"
                                 "SQLite/sqlite3.c" "SQLite/sqlite3.h"
-								"rapidxml/rapidxml.hpp" "rapidxml/rapidxml_iterators.hpp" "rapidxml/rapidxml_print.hpp" "rapidxml/rapidxml_utils.hpp")
+"rapidxml/rapidxml.hpp" "rapidxml/rapidxml_iterators.hpp" "rapidxml/rapidxml_print.hpp" "rapidxml/rapidxml_utils.hpp")
+
+if (WIN32)
 add_definitions(-DFOO)
+else()
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread" )
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ldl" )
+endif()
+
 
 # TODO: Add tests and install targets if needed.
